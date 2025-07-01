@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrgFlow - Análisis Organizacional Profesional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(30px) translateY(-30px); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-fill {
+            background: #4CAF50;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .company-size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .size-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .size-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .size-card {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .size-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .size-option input:checked + .size-card {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .size-number {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .size-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #4CAF50;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .info-card {
+            background: #e3f2fd;
+            border: 1px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 OrgFlow Enhanced</h1>
+            <p>Análisis Organizacional Profesional con Estándares ISO</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <form id="orgflowForm">
+                <!-- PASO 1: Información Básica de la Empresa -->
+                <div class="step active" data-step="1">
+                    <div class="step-title">
+                        <div class="step-number">1</div>
+                        <span>Información Básica de la Empresa</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="company_name">Nombre de la Empresa <span class="required">*</span></label>
+                            <input type="text" id="company_name" name="company_name" required 
+                                   placeholder="Ej: Empresa Innovadora SpA">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rut">RUT de la Empresa</label>
+                            <input type="text" id="rut" name="rut" 
+                                   placeholder="Ej: 12.345.678-9">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email de Contacto <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required 
+                                   placeholder="contacto@empresa.cl">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Ubicación Principal</label>
+                            <input type="text" id="location" name="location" 
+                                   placeholder="Ej: Santiago, Chile" value="Chile">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="sector">Sector Económico <span class="required">*</span></label>
+                            <select id="sector" name="sector" required>
+                                <option value="">Selecciona un sector</option>
+                                <option value="manufactura">Manufactura e Industria</option>
+                                <option value="servicios">Servicios Profesionales</option>
+                                <option value="tecnologia">Tecnología e Informática</option>
+                                <option value="comercio">Comercio y Retail</option>
+                                <option value="construccion">Construcción</option>
+                                <option value="salud">Salud y Medicina</option>
+                                <option value="educacion">Educación</option>
+                                <option value="transporte">Transporte y Logística</option>
+                                <option value="alimentaria">Industria Alimentaria</option>
+                                <option value="mineria">Minería</option>
+                                <option value="energia">Energía</option>
+                                <option value="turismo">Turismo y Hospitalidad</option>
+                                <option value="financiero">Sector Financiero</option>
+                                <option value="agricultura">Agricultura</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>💡 ¿Por qué necesitamos esta información?</h4>
+                        <p>Los datos básicos nos permiten contextualizar el análisis según las características específicas de tu industria y normativas aplicables en Chile.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 2: Tamaño y Estructura -->
+                <div class="step" data-step="2">
+                    <div class="step-title">
+                        <div class="step-number">2</div>
+                        <span>Tamaño y Estructura Organizacional</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tamaño de la Empresa <span class="required">*</span></label>
+                        <div class="company-size-grid">
+                            <div class="size-option">
+                                <input type="radio" id="micro" name="company_size" value="micro" required>
+                                <div class="size-card">
+                                    <div class="size-number">1-9</div>
+                                    <div class="size-label">Microempresa</div>
+                                </div>
+                            </div>
+                            <div class="size-option">
+                                <input type="radio" id="small" name="company_size" value="small">
+                                <div class="size-card">
+                                    <div class="size-number">10-49</div>
+                                    <div class="size-label">Pequeña</div>
+                                </div>
+                            </div>
+                            <div class="size-option">
+                                <input type="radio" id="medium" name="company_size" value="medium">
+                                <div class="size-card">
+                                    <div class="size-number">50-199</div>
+                                    <div class="size-label">Mediana</div>
+                                </div>
+                            </div>
+                            <div class="size-option">
+                                <input type="radio" id="large" name="company_size" value="large">
+                                <div class="size-card">
+                                    <div class="size-number">200+</div>
+                                    <div class="size-label">Grande</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="employees_count">Número Exacto de Empleados</label>
+                            <input type="number" id="employees_count" name="employees_count" 
+                                   placeholder="Ej: 25" min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="departments">Departamentos/Áreas Principales</label>
+                            <input type="text" id="departments" name="departments" 
+                                   placeholder="Ej: Ventas, Producción, RRHH (separados por comas)">
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📊 Impacto en el Análisis</h4>
+                        <p>El tamaño determina la complejidad del organigrama y los procedimientos ISO aplicables. Empresas más grandes requieren estructuras más formalizadas.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 3: Identidad Organizacional -->
+                <div class="step" data-step="3">
+                    <div class="step-title">
+                        <div class="step-number">3</div>
+                        <span>Identidad y Propósito Organizacional</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mission">Misión de la Empresa</label>
+                        <textarea id="mission" name="mission" 
+                                  placeholder="Describe el propósito fundamental de tu empresa. ¿Qué hacen y para quién?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vision">Visión de la Empresa</label>
+                        <textarea id="vision" name="vision" 
+                                  placeholder="¿Hacia dónde se dirige la empresa? ¿Cuál es su aspiración a futuro?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="values">Valores Corporativos</label>
+                        <textarea id="values" name="values" 
+                                  placeholder="Lista los valores fundamentales que guían las decisiones y comportamientos en la empresa"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="objectives">Objetivos Estratégicos Principales</label>
+                        <textarea id="objectives" name="objectives" 
+                                  placeholder="¿Cuáles son los 3-5 objetivos más importantes para los próximos 12-24 meses?"></textarea>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🎯 Importancia Estratégica</h4>
+                        <p>La identidad organizacional es fundamental para diseñar una estructura alineada con el propósito y crear procedimientos que reflejen los valores de la empresa.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 4: Procesos y Operaciones -->
+                <div class="step" data-step="4">
+                    <div class="step-title">
+                        <div class="step-number">4</div>
+                        <span>Procesos y Operaciones</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="processes">Procesos Clave de la Empresa <span class="required">*</span></label>
+                        <textarea id="processes" name="processes" required
+                                  placeholder="Describe los procesos principales: producción, ventas, atención al cliente, compras, etc. Incluye cualquier proceso crítico para el funcionamiento."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="current_challenges">Desafíos Operacionales Actuales</label>
+                        <textarea id="current_challenges" name="current_challenges"
+                                  placeholder="¿Qué problemas operacionales enfrentan actualmente? Ej: falta de coordinación, procesos duplicados, comunicación ineficiente"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="improvement_areas">Áreas de Mejora Identificadas</label>
+                        <textarea id="improvement_areas" name="improvement_areas"
+                                  placeholder="¿En qué áreas específicas buscan mejorar? Ej: eficiencia, calidad, comunicación, control de costos"></textarea>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>⚙️ Optimización de Procesos</h4>
+                        <p>Entender los procesos actuales es esencial para diseñar una estructura organizacional eficiente y crear manuales de procedimiento que realmente agreguen valor.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 5: Requisitos de Compliance -->
+                <div class="step" data-step="5">
+                    <div class="step-title">
+                        <div class="step-number">5</div>
+                        <span>Requisitos de Compliance y Certificaciones</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Certificaciones ISO de Interés:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="iso_9001" name="iso_9001" value="true">
+                                <label for="iso_9001">
+                                    <strong>ISO 9001</strong><br>
+                                    <small style="color: #666;">Gestión de Calidad</small>
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="iso_14001" name="iso_14001" value="true">
+                                <label for="iso_14001">
+                                    <strong>ISO 14001</strong><br>
+                                    <small style="color: #666;">Gestión Ambiental</small>
+                                </label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="iso_45001" name="iso_45001" value="true">
+                                <label for="iso_45001">
+                                    <strong>ISO 45001</strong><br>
+                                    <small style="color: #666;">Seguridad y Salud Ocupacional</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="other_requirements">Otros Requisitos Regulatorios</label>
+                        <textarea id="other_requirements" name="other_requirements"
+                                  placeholder="¿Tienen otros requisitos específicos del sector? Ej: normativas sanitarias, ambientales, de seguridad laboral específicas"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="compliance_urgency">Urgencia de Implementación</label>
+                        <select id="compliance_urgency" name="compliance_urgency">
+                            <option value="">Selecciona la urgencia</option>
+                            <option value="inmediata">Inmediata (1-3 meses)</option>
+                            <option value="corto_plazo">Corto plazo (3-6 meses)</option>
+                            <option value="mediano_plazo">Mediano plazo (6-12 meses)</option>
+                            <option value="largo_plazo">Largo plazo (más de 12 meses)</option>
+                            <option value="exploratorio">Solo exploración inicial</option>
+                        </select>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📋 Compliance Inteligente</h4>
+                        <p>Los estándares ISO no solo son certificaciones, son marcos de trabajo que mejoran la eficiencia operacional y reducen risks. Nuestro análisis priorizará las normativas más relevantes para tu sector.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 6: Información Adicional -->
+                <div class="step" data-step="6">
+                    <div class="step-title">
+                        <div class="step-number">6</div>
+                        <span>Información Adicional y Preferencias</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="current_structure">Estructura Organizacional Actual</label>
+                        <textarea id="current_structure" name="current_structure"
+                                  placeholder="Describe brevemente cómo está organizada actualmente la empresa. ¿Tienen organigrama? ¿Cómo se toman las decisiones?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="decision_making">Estilo de Toma de Decisiones Preferido</label>
+                        <select id="decision_making" name="decision_making">
+                            <option value="">Selecciona un estilo</option>
+                            <option value="centralizado">Centralizado (decisiones desde la dirección)</option>
+                            <option value="descentralizado">Descentralizado (autonomía por áreas)</option>
+                            <option value="mixto">Mixto (según tipo de decisión)</option>
+                            <option value="colaborativo">Colaborativo (decisiones en equipo)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="communication_preference">Preferencia de Comunicación</label>
+                        <select id="communication_preference" name="communication_preference">
+                            <option value="">Selecciona una preferencia</option>
+                            <option value="formal">Formal y estructurada</option>
+                            <option value="informal">Informal y directa</option>
+                            <option value="digital">Principalmente digital</option>
+                            <option value="presencial">Preferencia presencial</option>
+                            <option value="hibrida">Híbrida (digital + presencial)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additional_comments">Comentarios Adicionales</label>
+                        <textarea id="additional_comments" name="additional_comments"
+                                  placeholder="¿Hay algo específico que debemos considerar? Particularidades de tu industria, cultura organizacional, restricciones, etc."></textarea>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🎨 Personalización Total</h4>
+                        <p>Esta información nos permite crear una propuesta completamente personalizada que respete la cultura y necesidades específicas de tu organización.</p>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)">
+                        ← Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                        Siguiente →
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                        🚀 Generar Análisis
+                    </button>
+                </div>
+            </form>
+
+            <div class="loading" id="loadingDiv">
+                <div class="spinner"></div>
+                <h3>🔄 Procesando tu Análisis Organizacional</h3>
+                <p>Nuestro sistema está analizando la información y generando tu organigrama personalizado con estándares ISO. Esto puede tomar unos minutos...</p>
+            </div>
+
+            <div class="success-message" id="successDiv">
+                <div class="success-icon">✅</div>
+                <h3>¡Análisis Completado Exitosamente!</h3>
+                <p>Hemos enviado los resultados a tu correo electrónico. También puedes interactuar con nuestro bot de Telegram para consultas adicionales.</p>
+                <p><strong>ID de Sesión:</strong> <span id="sessionId"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        function updateProgressBar() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showStep(stepNumber) {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Mostrar el paso actual
+            document.querySelector(`[data-step="${stepNumber}"]`).classList.add('active');
+            
+            // Actualizar botones
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            prevBtn.style.display = stepNumber === 1 ? 'none' : 'block';
+            
+            if (stepNumber === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+            
+            updateProgressBar();
+        }
+
+        function validateStep(stepNumber) {
+            const currentStepElement = document.querySelector(`[data-step="${stepNumber}"]`);
+            const requiredFields = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            let isValid = true;
+            let errorMessage = '';
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#e74c3c';
+                    errorMessage = 'Por favor completa todos los campos requeridos.';
+                } else {
+                    field.style.borderColor = '#e1e5e9';
+                }
+            });
+
+            // Validación específica para email
+            if (stepNumber === 1) {
+                const email = document.getElementById('email');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (email.value &&

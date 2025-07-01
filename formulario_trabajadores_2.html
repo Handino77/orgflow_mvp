@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrgFlow - Estructura Organizacional y Personal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            50% { transform: translateX(30px) translateY(-30px); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .employee-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .employee-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+        }
+
+        .employee-card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .employee-number {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .remove-employee {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-employee:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .add-employee-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .add-employee-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .hierarchy-builder {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .hierarchy-level {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .level-number {
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .level-input {
+            flex: 1;
+        }
+
+        .info-card {
+            background: #e3f2fd;
+            border: 1px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .warning-card {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .warning-card h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #4CAF50;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+
+            .hierarchy-level {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 OrgFlow - Estructura Organizacional</h1>
+            <p>Definición de Personal, Roles y Jerarquías para Organigrama y Manuales ISO</p>
+        </div>
+
+        <div class="form-container">
+            <form id="organizationalForm">
+                <!-- SECCIÓN 1: Información General de la Estructura -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="section-icon">🏢</div>
+                        <span>Información General de la Estructura</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="organization_type">Tipo de Estructura Organizacional <span class="required">*</span></label>
+                            <select id="organization_type" name="organization_type" required>
+                                <option value="">Selecciona el tipo</option>
+                                <option value="funcional">Funcional (por departamentos)</option>
+                                <option value="divisional">Divisional (por productos/mercados)</option>
+                                <option value="matricial">Matricial (híbrida)</option>
+                                <option value="plana">Plana (pocos niveles jerárquicos)</option>
+                                <option value="jerarquica">Jerárquica tradicional</option>
+                                <option value="red">En red (equipos interconectados)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reporting_levels">Niveles Jerárquicos <span class="required">*</span></label>
+                            <select id="reporting_levels" name="reporting_levels" required onchange="generateHierarchyLevels()">
+                                <option value="">Selecciona los niveles</option>
+                                <option value="2">2 niveles (Dirección + Operativo)</option>
+                                <option value="3">3 niveles (Dirección + Supervisión + Operativo)</option>
+                                <option value="4">4 niveles (Dirección + Gerencia + Supervisión + Operativo)</option>
+                                <option value="5">5 niveles (Directorio + Gerencia + Jefatura + Supervisión + Operativo)</option>
+                                <option value="6">6+ niveles (Estructura compleja)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="departments_list">Departamentos/Áreas Existentes <span class="required">*</span></label>
+                            <textarea id="departments_list" name="departments_list" required
+                                      placeholder="Lista todos los departamentos o áreas. Ej: Gerencia General, Ventas, Producción, RRHH, Contabilidad, IT, Logística"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>📋 Definición de Estructura</h4>
+                        <p>La estructura organizacional determina cómo se distribuye la autoridad, las responsabilidades y la comunicación. Esta información es fundamental para crear organigramas claros y procedimientos ISO alineados.</p>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: Definición de Niveles Jerárquicos -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="section-icon">📊</div>
+                        <span>Definición de Niveles Jerárquicos</span>
+                    </div>
+
+                    <div class="hierarchy-builder" id="hierarchyLevels">
+                        <p>Selecciona primero el número de niveles jerárquicos para definir cada nivel.</p>
+                    </div>
+
+                    <div class="warning-card">
+                        <h4>⚠️ Importante</h4>
+                        <p>Define claramente cada nivel jerárquico. Esto determinará las líneas de reporte y autoridad en el organigrama, así como los procedimientos de escalamiento en los manuales ISO.</p>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: Registro de Personal -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="section-icon">👤</div>
+                        <span>Registro de Personal</span>
+                    </div>
+
+                    <button type="button" class="add-employee-btn" onclick="addEmployee()">
+                        ➕ Agregar Nuevo Empleado
+                    </button>
+
+                    <div id="employeesContainer">
+                        <!-- Los empleados se agregarán dinámicamente aquí -->
+                    </div>
+
+                    <div class="info-card">
+                        <h4>👥 Gestión de Personal</h4>
+                        <p>Registra al menos los puestos clave de cada departamento. No es necesario incluir a todo el personal, pero sí los roles críticos para el funcionamiento y la toma de decisiones.</p>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 4: Relaciones y Dependencias -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="section-icon">🔗</div>
+                        <span>Relaciones y Dependencias</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="reporting_relationships">Relaciones de Reporte Principal</label>
+                            <textarea id="reporting_relationships" name="reporting_relationships"
+                                      placeholder="Describe las principales relaciones de reporte. Ej: Gerente de Ventas reporta a Gerente General, Supervisores de Producción reportan a Jefe de Producción"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="cross_functional">Relaciones Interfuncionales</label>
+                            <textarea id="cross_functional" name="cross_functional"
+                                      placeholder="¿Qué áreas deben coordinarse regularmente? Ej: Ventas coordina con Producción para entregas, RRHH coordina con todos los departamentos"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="decision_authority">Niveles de Autoridad para Decisiones</label>
+                            <textarea id="decision_authority" name="decision_authority"
+                                      placeholder="¿Quién puede tomar qué tipo de decisiones? Ej: Compras hasta $X por supervisor, contrataciones por RRHH con aprobación gerencial"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="communication_flow">Flujo de Comunicación</label>
+                            <select id="communication_flow" name="communication_flow">
+                                <option value="">Selecciona el flujo principal</option>
+                                <option value="vertical">Principalmente vertical (arriba-abajo)</option>
+                                <option value="horizontal">Principalmente horizontal (entre pares)</option>
+                                <option value="mixto">Mixto (vertical y horizontal)</option>
+                                <option value="circular">Circular (toda la organización)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 5: Procesos y Responsabilidades -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="section-icon">⚙️</div>
+                        <span>Procesos y Responsabilidades</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="key_processes_owners">Propietarios de Procesos Clave</label>
+                            <textarea id="key_processes_owners" name="key_processes_owners"
+                                      placeholder="¿Quién es responsable de cada proceso clave? Ej: Proceso de Ventas - Gerente Comercial, Proceso de Producción - Jefe de Planta, Proceso de Compras - Encargado de Abastecimiento"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quality_responsible">Responsable de Calidad</label>
+                            <input type="text" id="quality_responsible" name="quality_responsible"
+                                   placeholder="Cargo del responsable de calidad">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="safety_responsible">Responsable de Seguridad</label>
+                            <input type="text" id="safety_responsible" name="safety_responsible"
+                                   placeholder="Cargo del responsable de seguridad">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="environmental_responsible">Responsable Ambiental</label>
+                            <input type="text" id="environmental_responsible" name="environmental_responsible"
+                                   placeholder="Cargo del responsable ambiental">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="backup_roles">Roles de Respaldo/Suplencia</label>
+                            <textarea id="backup_roles" name="backup_roles"
+                                      placeholder="¿Quién puede suplir a los roles clave en ausencias? Esto es importante para la continuidad operacional"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🎯 Responsabilidades ISO</h4>
+                        <p>Los estándares ISO requieren roles claramente definidos para calidad, seguridad y medio ambiente. Esta información es crucial para los manuales de procedimiento.</p>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 6: Información Adicional -->
+                <div class="section">
+                    <div class="section-title">
+                        <div class="section-icon">📝</div>
+                        <span>Información Adicional</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="work_shifts">Turnos de Trabajo</label>
+                            <select id="work_shifts" name="work_shifts">
+                                <option value="">Selecciona el tipo de turnos</option>
+                                <option value="diurno">Solo turno diurno</option>
+                                <option value="extendido">Turno extendido (mañana-tarde)</option>
+                                <option value="dos_turnos">Dos turnos (día/noche)</option>
+                                <option value="tres_turnos">Tres turnos (24 horas)</option>
+                                <option value="flexible">Horarios flexibles</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="remote_work">Modalidad de Trabajo</label>
+                            <select id="remote_work" name="remote_work">
+                                <option value="">Selecciona la modalidad</option>
+                                <option value="presencial">100% Presencial</option>
+                                <option value="hibrido">Híbrido (presencial + remoto)</option>
+                                <option value="remoto">Principalmente remoto</option>
+                                <option value="mixto">Mixto según el rol</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="seasonal_changes">Cambios Estacionales o Temporales</label>
+                            <textarea id="seasonal_changes" name="seasonal_changes"
+                                      placeholder="¿Hay cambios en la estructura según la temporada? Ej: personal adicional en temporada alta, reorganización por proyectos"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="growth_plans">Planes de Crecimiento</label>
+                            <textarea id="growth_plans" name="growth_plans"
+                                      placeholder="¿Planean expandir el equipo? ¿Qué nuevos roles necesitarán? Esto ayuda a diseñar una estructura escalable"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="special_considerations">Consideraciones Especiales</label>
+                            <textarea id="special_considerations" name="special_considerations"
+                                      placeholder="¿Hay algo único en su organización? Equipos multidisciplinarios, roles compartidos, estructuras matriciales complejas, etc."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="goBack()">
+                        ← Volver al Formulario Anterior
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        🚀 Generar Organigrama y Manuales
+                    </button>
+                </div>
+            </form>
+
+            <div class="loading" id="loadingDiv">
+                <div class="spinner"></div>
+                <h3>🔄 Generando Estructura Organizacional</h3>
+                <p>Estamos procesando la información para crear tu organigrama personalizado y los manuales de procedimiento ISO. Este proceso puede tomar unos minutos...</p>
+            </div>
+
+            <div class="success-message" id="successDiv">
+                <div class="success-icon">✅</div>
+                <h3>¡Estructura Organizacional Completada!</h3>
+                <p>Hemos generado tu organigrama y los manuales de procedimiento. Los documentos han sido enviados a tu correo electrónico.</p>
+                <p><strong>Documentos generados:</strong></p>
+                <ul style="text-align: left; margin-top: 15px;">
+                    <li>Organigrama empresarial interactivo</li>
+                    <li>Manual de procedimientos ISO</li>
+                    <li>Matriz de responsabilidades</li>
+                    <li>Flujos de comunicación</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let employeeCount = 0;
+
+        function generateHierarchyLevels() {
+            const levels = document.getElementById('reporting_levels').value;
+            const container = document.getElementById('hierarchyLevels');
+            
+            if (!levels) {
+                container.innerHTML = '<p>Selecciona primero el número de niveles jerárquicos para definir cada nivel.</p>';
+                return;
+            }
+
+            const levelNames = {
+                2: ['Nivel Directivo', 'Nivel Operativo'],
+                3: ['Nivel Directivo', 'Nivel Supervisión', 'Nivel Operativo'],
+                4: ['Nivel Directivo', 'Nivel Gerencial', 'Nivel Supervisión', 'Nivel Operativo'],
+                5: ['Directorio/Propietario', 'Gerencia General', 'Jefaturas/Coordinación', 'Supervisión', 'Nivel Operativo'],
+                6: ['Directorio', 'Gerencia General', 'Gerencias de Área', 'Jefaturas', 'Supervisión', 'Nivel Operativo']
+            };
+
+            let html = '<h4 style="margin-bottom: 20px; color: #667eea;">Define cada nivel jerárquico:</h4>';
+            
+            const names = levelNames[levels] || [];
+            for (let i = 1; i <= parseInt(levels); i++) {
+                const defaultName = names[i-1] || `Nivel ${i}`;
+                html += `
+                    <div class="hierarchy-level">
+                        <div class="level-number">${i}</div>
+                        <div class="level-input">
+                            <input type="text" 
+                                   name="hierarchy_level_${i}" 
+                                   placeholder="Nombre del nivel ${i}"
+                                   value="${defaultName}"
+                                   style="margin-bottom: 8px;">
+                            <textarea name="hierarchy_description_${i}" 
+                                      placeholder="Descripción de responsabilidades y autoridad de este nivel"
+                                      style="min-height: 80px;"></textarea>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function addEmployee() {
+            employeeCount++;
+            const container = document.getElementById('employeesContainer');
+            
+            const employeeCard = document.createElement('div');
+            employeeCard.className = 'employee-card';
+            employeeCard.innerHTML = `
+                <div class="employee-number">${employeeCount}</div>
+                <button type="button" class="remove-employee" onclick="removeEmployee(this)">×</button>
+                <h4>Empleado ${employeeCount}</h4>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre del Puesto/Cargo <span class="required">*</span></label>
+                        <input type="text" name="employee_${employeeCount}_position" required
+                               placeholder="Ej: Gerente de Ventas">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Departamento/Área</label>
+                        <input type="text" name="employee_${employeeCount}_department" 
+                               placeholder="Ej: Comercial">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nivel Jerárquico</label>
+                        <select name="employee_${employeeCount}_level">
+                            <option value="">Selecciona el nivel</option>
+                            <option value="1">Nivel 1 (Más alto)</option>
+                            <option value="2">Nivel 2</option>
+                            <option value="3">Nivel 3</option>
+                            <option value="4">Nivel 4</option>
+                            <option value="5">Nivel 5</option>
+                            <option value="6">Nivel 6 (Más bajo)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Reporta a (Cargo)</label>
+                        <input type="text" name="employee_${employeeCount}_reports_to" 
+                               placeholder="Ej: Gerente General">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Principales Responsabilidades</label>
+                        <textarea name="employee_${employeeCount}_responsibilities" 
+                                  placeholder="Lista las 3-5 responsabilidades principales de este puesto"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Personas a Cargo</label>
+                        <input type="number" name="employee_${employeeCount}_subordinates" 
+                               placeholder="Número de personas que supervisa" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tipo de Contrato</label>
+                        <select name="employee
