@@ -401,6 +401,7 @@
 
         <div class="form-container">
             <form id="orgflowForm">
+                <!-- PASO 1: Información Básica de la Empresa -->
                 <div class="step active" data-step="1">
                     <div class="step-title">
                         <div class="step-number">1</div>
@@ -461,6 +462,7 @@
                     </div>
                 </div>
 
+                <!-- PASO 2: Tamaño y Estructura -->
                 <div class="step" data-step="2">
                     <div class="step-title">
                         <div class="step-number">2</div>
@@ -521,6 +523,7 @@
                     </div>
                 </div>
 
+                <!-- PASO 3: Identidad Organizacional -->
                 <div class="step" data-step="3">
                     <div class="step-title">
                         <div class="step-number">3</div>
@@ -557,6 +560,7 @@
                     </div>
                 </div>
 
+                <!-- PASO 4: Procesos y Operaciones -->
                 <div class="step" data-step="4">
                     <div class="step-title">
                         <div class="step-number">4</div>
@@ -587,6 +591,7 @@
                     </div>
                 </div>
 
+                <!-- PASO 5: Requisitos de Compliance -->
                 <div class="step" data-step="5">
                     <div class="step-title">
                         <div class="step-number">5</div>
@@ -644,6 +649,7 @@
                     </div>
                 </div>
 
+                <!-- PASO 6: Información Adicional -->
                 <div class="step" data-step="6">
                     <div class="step-title">
                         <div class="step-number">6</div>
@@ -724,13 +730,6 @@
     <script>
         let currentStep = 1;
         const totalSteps = 6;
-        const form = document.getElementById('orgflowForm');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // URL de tu webhook de n8n (reemplaza con tu URL real)
-        const N8N_WEBHOOK_URL_FORM1 = 'https://primary-production-3b83.up.railway.app/webhook/formulario1';
 
         function updateProgressBar() {
             const progress = (currentStep / totalSteps) * 100;
@@ -738,12 +737,28 @@
         }
 
         function showStep(stepNumber) {
-            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            // Ocultar todos los pasos
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Mostrar el paso actual
             document.querySelector(`[data-step="${stepNumber}"]`).classList.add('active');
             
+            // Actualizar botones
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            
             prevBtn.style.display = stepNumber === 1 ? 'none' : 'block';
-            nextBtn.style.display = stepNumber === totalSteps ? 'none' : 'block';
-            submitBtn.style.display = stepNumber === totalSteps ? 'block' : 'none';
+            
+            if (stepNumber === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
             
             updateProgressBar();
         }
@@ -751,91 +766,20 @@
         function validateStep(stepNumber) {
             const currentStepElement = document.querySelector(`[data-step="${stepNumber}"]`);
             const requiredFields = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+            
             let isValid = true;
+            let errorMessage = '';
             
             requiredFields.forEach(field => {
-                let fieldIsValid = false;
-                if (field.type === 'radio') {
-                    const radioGroup = document.getElementsByName(field.name);
-                    if (Array.from(radioGroup).some(r => r.checked)) {
-                        fieldIsValid = true;
-                    }
-                } else if (field.value.trim() !== '') {
-                    fieldIsValid = true;
-                }
-
-                if (!fieldIsValid) {
+                if (!field.value.trim()) {
                     isValid = false;
                     field.style.borderColor = '#e74c3c';
-                    const label = field.closest('.form-group, .size-option');
-                    if(label) label.style.border = '1px solid #e74c3c';
+                    errorMessage = 'Por favor completa todos los campos requeridos.';
                 } else {
                     field.style.borderColor = '#e1e5e9';
-                     const label = field.closest('.form-group, .size-option');
-                    if(label) label.style.border = 'none';
                 }
             });
 
-            const errorDiv = document.getElementById('errorMessage');
-            if (!isValid) {
-                errorDiv.textContent = 'Por favor, completa todos los campos obligatorios (*) antes de continuar.';
-                errorDiv.style.display = 'block';
-            } else {
-                errorDiv.style.display = 'none';
-            }
-
-            return isValid;
-        }
-
-        function changeStep(direction) {
-            if (direction > 0 && !validateStep(currentStep)) {
-                return;
-            }
-            currentStep += direction;
-            showStep(currentStep);
-        }
-
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            if (!validateStep(currentStep)) {
-                return;
-            }
-
-            // Mostrar animación de carga
-            document.querySelector('.form-container').style.display = 'none';
-            document.getElementById('loadingDiv').style.display = 'block';
-
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch(N8N_WEBHOOK_URL_FORM1, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.session_id) {
-                    // Redirigir al segundo formulario con el session_id
-                    window.location.href = `formulario_trabajadores_2.html?session_id=${result.session_id}`;
-                } else {
-                    throw new Error(result.message || 'Hubo un error al procesar la solicitud.');
-                }
-            } catch (error) {
-                document.getElementById('loadingDiv').style.display = 'none';
-                const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = `Error: ${error.message}`;
-                errorDiv.style.display = 'block';
-                 document.querySelector('.form-container').style.display = 'block';
-            }
-        });
-
-        // Inicializar el formulario
-        showStep(currentStep);
-    </script>
-</body>
-</html>
- 
-   
+            // Validación específica para email
+            if (stepNumber === 1) {
+                const email = document.getElementById('email');
