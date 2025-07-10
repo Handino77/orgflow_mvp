@@ -373,6 +373,18 @@
             margin-bottom: 20px;
         }
 
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #e74c3c;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -654,11 +666,21 @@
                     <li>Flujos de comunicación</li>
                 </ul>
             </div>
+
+            <div class="error-message" id="errorDiv">
+                <div class="error-icon">❌</div>
+                <h3>Error al Procesar el Formulario</h3>
+                <p id="errorMessage">Hubo un problema al enviar la información. Por favor, intenta nuevamente.</p>
+                <button class="btn btn-primary" onclick="hideError()" style="margin-top: 20px;">
+                    Intentar Nuevamente
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         let employeeCount = 0;
+        const WEBHOOK_URL = 'https://primary-production-3b83.up.railway.app/webhook/formulario2';
 
         function generateHierarchyLevels() {
             const levels = document.getElementById('reporting_levels').value;
@@ -742,21 +764,4 @@
                     <div class="form-group">
                         <label>Reporta a (Cargo)</label>
                         <input type="text" name="employee_${employeeCount}_reports_to" 
-                               placeholder="Ej: Gerente General">
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label>Principales Responsabilidades</label>
-                        <textarea name="employee_${employeeCount}_responsibilities" 
-                                  placeholder="Lista las 3-5 responsabilidades principales de este puesto"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Personas a Cargo</label>
-                        <input type="number" name="employee_${employeeCount}_subordinates" 
-                               placeholder="Número de personas que supervisa" min="0">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Tipo de Contrato</label>
-                        <select name="employee
+                               placeholder="
