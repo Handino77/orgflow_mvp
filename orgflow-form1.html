@@ -771,24 +771,33 @@
             let isValid = true;
             let errorMessage = '';
             
+            // Reset previous error styles for all required fields in the current step
+            requiredFields.forEach(field => {
+                field.style.borderColor = '#e1e5e9'; // Reset to default border color
+            });
+
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
                     isValid = false;
-                    field.style.borderColor = '#e74c3c';
-                    errorMessage = 'Por favor completa todos los campos requeridos.';
-                } else {
-                    field.style.borderColor = '#e1e5e9';
+                    field.style.borderColor = '#e74c3c'; // Highlight invalid field with red border
+                    if (!errorMessage) { // Only set the first error message encountered
+                        errorMessage = 'Por favor completa todos los campos requeridos.';
+                        field.focus(); // Focus on the first invalid field
+                    }
                 }
             });
 
-            // Validación específica para email
+            // Validación específica para email en el Paso 1
             if (stepNumber === 1) {
                 const email = document.getElementById('email');
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (email.value && !emailRegex.test(email.value)) {
                     isValid = false;
                     email.style.borderColor = '#e74c3c';
-                    errorMessage = 'Por favor ingresa un email válido.';
+                    if (!errorMessage) { // Set email error if no other error yet
+                        errorMessage = 'Por favor ingresa un email válido.';
+                        email.focus();
+                    }
                 }
             }
 
@@ -796,6 +805,8 @@
             if (!isValid) {
                 errorDiv.textContent = errorMessage;
                 errorDiv.style.display = 'block';
+                // Scroll the error message into view to ensure the user sees it
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
             } else {
                 errorDiv.style.display = 'none';
             }
