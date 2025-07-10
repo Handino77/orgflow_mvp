@@ -463,96 +463,64 @@
                 </div>
 
                 <!-- PASO 2: Tamaño y Estructura -->
-                <div class="step" data-step="2">
-                    <div class="step-title">
-                        <div class="step-number">2</div>
-                        <span>Tamaño y Estructura Organizacional</span>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Tamaño de la Empresa <span class="required">*</span></label>
-                        <div class="company-size-grid">
-                            <div class="size-option">
-                                <input type="radio" id="micro" name="company_size" value="micro">
-                                <div class="size-card">
-                                    <div class="size-number">1-9</div>
-                                    <div class="size-label">Microempresa</div>
-                                </div>
-                            </div>
-                           <div class="size-option">
-    <input type="radio" id="micro" name="company_size" value="micro" required>
-    <div class="size-card">
-        <div class="size-number">1-9</div>
-        <div class="size-label">Microempresa</div>
+<div class="step" data-step="2">
+    <div class="step-title">
+        <div class="step-number">2</div>
+        <span>Tamaño y Estructura Organizacional</span>
     </div>
-</div>
-<div class="size-option">
-    <input type="radio" id="small" name="company_size" value="small">
-    <div class="size-card">
-        <div class="size-number">10-49</div>
-        <div class="size-label">Pequeña</div>
-    </div>
-</div>
-<div class="size-option">
-    <input type="radio" id="medium" name="company_size" value="medium">
-    <div class="size-card">
-        <div class="size-number">50-199</div>
-        <div class="size-label">Mediana</div>
-    </div>
-</div>
-<div class="form-group">
-    <label>Tamaño de la Empresa <span class="required">*</span></label>
-    <div class="company-size-grid">
-        <div class="size-option">
-            <input type="radio" id="micro" name="company_size" value="micro" required>
-            <div class="size-card">
-                <div class="size-number">1-9</div>
-                <div class="size-label">Microempresa</div>
-            </div>
-        </div>
-        <div class="size-option">
-            <input type="radio" id="pequena" name="company_size" value="pequena">
-            <div class="size-card">
-                <div class="size-number">10-49</div>
-                <div class="size-label">Pequeña</div>
-            </div>
-        </div>
-        <div class="size-option">
-            <input type="radio" id="mediana" name="company_size" value="mediana">
-            <div class="size-card">
-                <div class="size-number">50-199</div>
-                <div class="size-label">Mediana</div>
-            </div>
-        </div>
-        <div class="size-option">
-            <input type="radio" id="grande" name="company_size" value="grande">
-            <div class="size-card">
-                <div class="size-number">200+</div>
-                <div class="size-label">Grande</div>
-            </div>
-        </div>
-    </div>
-</div>
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="employees_count">Número Exacto de Empleados</label>
-                            <input type="number" id="employees_count" name="employees_count" 
-                                   placeholder="Ej: 25" min="1">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="departments">Departamentos/Áreas Principales</label>
-                            <input type="text" id="departments" name="departments" 
-                                   placeholder="Ej: Ventas, Producción, RRHH (separados por comas)">
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <h4>📊 Impacto en el Análisis</h4>
-                        <p>El tamaño determina la complejidad del organigrama y los procedimientos ISO aplicables. Empresas más grandes requieren estructuras más formalizadas.</p>
-                    </div>
+    <!-- Tamaño de la Empresa -->
+    <div class="form-group">
+        <label>Tamaño de la Empresa <span class="required">*</span></label>
+        <div class="company-size-grid">
+            <div class="size-option">
+                <input type="radio" id="micro" name="company_size" value="micro" required>
+                <div class="size-card">
+                    <div class="size-number">1-9</div>
+                    <div class="size-label">Microempresa</div>
                 </div>
+            </div>
+            <div class="size-option">
+                <input type="radio" id="pequena" name="company_size" value="pequena">
+                <div class="size-card">
+                    <div class="size-number">10-49</div>
+                    <div class="size-label">Pequeña</div>
+                </div>
+            </div>
+            <div class="size-option">
+                <input type="radio" id="mediana" name="company_size" value="mediana">
+                <div class="size-card">
+                    <div class="size-number">50-199</div>
+                    <div class="size-label">Mediana</div>
+                </div>
+            </div>
+            <div class="size-option">
+                <input type="radio" id="grande" name="company_size" value="grande">
+                <div class="size-card">
+                    <div class="size-number">200+</div>
+                    <div class="size-label">Grande</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Número exacto de empleados y departamentos -->
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="employees_count">Número Exacto de Empleados</label>
+            <input type="number" id="employees_count" name="employees_count" placeholder="Ej: 25" min="1">
+        </div>
+        <div class="form-group">
+            <label for="departments">Departamentos/Áreas Principales</label>
+            <input type="text" id="departments" name="departments" placeholder="Ej: Ventas, Producción, RRHH (separados por comas)">
+        </div>
+    </div>
+
+    <div class="info-card">
+        <h4>📊 Impacto en el Análisis</h4>
+        <p>El tamaño determina la complejidad del organigrama y los procedimientos ISO aplicables. Empresas más grandes requieren estructuras más formalizadas.</p>
+    </div>
+</div>
 
                 <!-- PASO 3: Identidad Organizacional -->
                 <div class="step" data-step="3">
